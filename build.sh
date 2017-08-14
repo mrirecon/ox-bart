@@ -3,13 +3,13 @@
 set -eu
 set -o pipefail
 
-OX_INSTALL_DIRECTORY=${OX_INSTALL_DIRECTORY?="Ox SDK directory not set!"}
-TOOLBOX_PATH=${TOOLBOX_PATH?="BART TOOLBOX_PATH not set!"}
+OX_INSTALL_DIRECTORY=${OX_INSTALL_DIRECTORY?="Orchestra SDK directory (OX_INSTALL_DIRECTORY) not set!"}
+TOOLBOX_PATH=${TOOLBOX_PATH?="BART directory (TOOLBOX_PATH) not set!"}
+
+export CC=${CC:= gcc-4.9}
+export CXX=${CXX:=g++-4.9}
 
 VERBOSE=${VERBOSE:=0}
-
-export CC=gcc-4.9
-export CXX=g++-4.9
 
 mkdir -p build
 pushd build
