@@ -171,11 +171,16 @@ void BartIO::PfileToBart(const long dims[PFILE_DIMS], _Complex float* out, const
 	unsigned int N = PFILE_DIMS;
 
 	// FIXME: check compatibility of pfile dimensions
+	// FIXME: check phases vs passes
 
 	const int numSlices = dims[2];
 	const int numEchoes = dims[3];
 	const int numChannels = dims[4];
+#if 0
 	const int numPhases = dims[5];
+#else
+	const int numPasses = dims[5];
+#endif
 
 	bool zip_on = false;
 	bool zip_forward = true;
@@ -192,11 +197,11 @@ void BartIO::PfileToBart(const long dims[PFILE_DIMS], _Complex float* out, const
 
 	// copy into bart format and store in out
 #pragma omp parallel for collapse(4)
-	for (int currentSlice = 0; currentSlice < numSlices; currentSlice++) {
+	for (int currentPass = 0; currentPass < numPasses; currentPass++) {
 
-		for (int currentEcho = 0; currentEcho < numEchoes; currentEcho++) {
+		for (int currentSlice = 0; currentSlice < numSlices; currentSlice++) {
 
-			for (int currentPhase = 0; currentPhase < numPhases; currentPhase++) {
+			for (int currentEcho = 0; currentEcho < numEchoes; currentEcho++) {
 
 				for (int currentChannel = 0; currentChannel < numChannels; currentChannel++) {
 
@@ -205,7 +210,11 @@ void BartIO::PfileToBart(const long dims[PFILE_DIMS], _Complex float* out, const
 					if (!zip_forward)
 						sl = numZipSlices - currentSlice - 1;
 
+#if 0
 					const ComplexFloatMatrix kSpace = pfile->KSpaceData<float>(sl, currentEcho, currentChannel, currentPhase);
+#else
+					const ComplexFloatMatrix kSpace = pfile->KSpaceData<float>(Legacy::Pfile::PassSlicePair(currentPass, sl), currentEcho, currentChannel);
+#endif
 
 					long dims1[N];
 					BartIO::BartDims(dims1, kSpace);
@@ -216,7 +225,7 @@ void BartIO::PfileToBart(const long dims[PFILE_DIMS], _Complex float* out, const
 					pos[2] = currentSlice;
 					pos[3] = currentEcho;
 					pos[4] = currentChannel;
-					pos[5] = currentPhase;
+					pos[5] = currentPass;
 
 					md_copy_block(N, pos, dims, out, dims1, kSpace.data(), CFL_SIZE);
 				}

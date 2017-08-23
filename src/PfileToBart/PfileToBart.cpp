@@ -88,6 +88,14 @@ void GERecon::BartWrite()
 	const int numEchoes = pfile->EchoCount();
 	const int numChannels = pfile->ChannelCount();
 	const int numPhases = pfile->PhaseCount();
+	const int numPasses = pfile->PassCount();
+
+	debug_printf(DP_DEBUG1, "Pfile dims: \n");
+	debug_printf(DP_DEBUG1, "Spatial dims\t%03d %03d %03d\n", acqXRes, acqYRes, acqZRes);
+	debug_printf(DP_DEBUG1, "numEchoes\t%03d\n", numEchoes);
+	debug_printf(DP_DEBUG1, "numChannels\t%03d\n", numChannels);
+	debug_printf(DP_DEBUG1, "numPhases\t%03d\n", numPhases);
+	debug_printf(DP_DEBUG1, "numPasses\t%03d\n", numPasses);
 
 	// Get output name
 	const boost::optional<std::string> OutString = CommandLine::Output();
@@ -98,6 +106,7 @@ void GERecon::BartWrite()
 	// load kspace data from Pfile
 	long dims[PFILE_DIMS];
 	
+	// FIXME: differentiate between passes and phases
 	dims[0] = acqXRes;
 	dims[1] = acqYRes;
 	dims[2] = acqZRes;
