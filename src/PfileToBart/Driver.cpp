@@ -22,7 +22,7 @@ using namespace GERecon;
 
 static void print_usage(const char* arg)
 {
-	std::cout << "Usage: " << arg << "[options] --pfile <Pfile> --output <kspace>" << std::endl << std::endl;
+	std::cout << "Usage: " << arg << " [options] --pfile <Pfile> --output <kspace>" << std::endl << std::endl;
 	std::cout << "Write <Pfile> data into BART-formatted file <kspace>." << std::endl;
 	std::cout << "--fft flags performs an FFT on the data along flags" << std::endl;
 	std::cout << "--ifft flags performs an IFFT on the data along flags" << std::endl;
