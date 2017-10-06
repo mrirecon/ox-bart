@@ -52,10 +52,11 @@ Takes a Pfile and a bart kspace file, and generates Dicoms using the Ox Dicom ch
 e.g. gradwarp, resizing, etc.
 
 ```bash
-Usage: BartToDicom [--fft flags] [--ifft flags] [--fftmod flags] --pfile <Pfile> --input <kspace>
+Usage: BartToDicom [options] --pfile <Pfile> --input <kspace>
 
 Write BART-formatted data in <kspace> to dicom using Pfile info.
 --fft flags performs an FFT on the data along flags
 --ifft flags performs an IFFT on the data along flags
 --fftmod flags performs an FFTMod on the data along flags
+--weights <weights> inputs custom channel weights
 ```

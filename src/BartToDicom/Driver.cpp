@@ -23,11 +23,12 @@ using namespace GERecon;
 static void print_usage(const char* arg)
 {
 	std::cout << std::endl;
-	std::cout << "Usage: " << arg << "[--fft flags] [--ifft flags] [--fftmod flags] --pfile <Pfile> --input <kspace>" << std::endl;
+	std::cout << "Usage: " << arg << " [options] --pfile <Pfile> --input <kspace>" << std::endl;
 	std::cout << "Write BART-formatted data in <kspace> to dicom using Pfile info." << std::endl;
 	std::cout << "--fft flags performs an FFT on the data along flags" << std::endl;
 	std::cout << "--ifft flags performs an IFFT on the data along flags" << std::endl;
 	std::cout << "--fftmod flags performs an FFTMod on the data along flags" << std::endl;
+	std::cout << "--weights <weights> inputs custom channel weights" << std::endl;
 }
 
     

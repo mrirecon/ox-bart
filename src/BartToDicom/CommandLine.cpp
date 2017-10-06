@@ -72,6 +72,21 @@ boost::optional<std::string> CommandLine::BartInput()
 }
 
 
+// Create option for channel weights
+boost::optional<std::string> CommandLine::ChannelWeights()
+{
+    boost::program_options::options_description options;
+
+    options.add_options()
+        ("weights", boost::program_options::value<std::string>(), "Input channel weights to BART file.");
+
+    const GESystem::ProgramOptions programOptions;
+    programOptions.AddOptions(options);
+
+    return programOptions.Get<std::string>("weights");
+}
+
+
 // Option for performing IFFT along flags
 boost::optional<long> CommandLine::IFFT()
 {

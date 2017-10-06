@@ -60,6 +60,14 @@ namespace GERecon
         static boost::optional<std::string> BartInput();
 
         /**
+         * Input Channel weights in BART format
+         *
+         * Usage:
+         *   --weights <file>
+         */
+        static boost::optional<std::string> ChannelWeights();
+
+        /**
          * IFFT flags
          *
          * Usage:

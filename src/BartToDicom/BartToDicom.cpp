@@ -90,6 +90,16 @@ void GERecon::BartToDicom()
 	long dims[DIMS];
 	_Complex float* data = load_cfl(InString->c_str(), DIMS, dims);
 
+	// Get channel weights input name
+	const boost::optional<std::string> ChannelWeightsString = CommandLine::ChannelWeights();
+
+	long cdims[DIMS];
+	_Complex float* weights = NULL;
+
+	if (ChannelWeightsString)
+		weights = load_cfl(ChannelWeightsString->c_str(), DIMS, cdims);
+
+
 	if (0 != fftmod_flags) {
 
 		trace->ConsoleMsg("bart fftmod %d", fftmod_flags);
@@ -109,7 +119,10 @@ void GERecon::BartToDicom()
 	}
 
 	// write to dicom
-	BartIO::BartToDicom(dims, "Image", seriesNumber, seriesDescription, dicomNetwork, data, pfile, pfileVersion);
+	BartIO::BartToDicom(dims, "Image", seriesNumber, seriesDescription, dicomNetwork, data, pfile, pfileVersion, weights);
+
+	if (NULL != weights)
+		unmap_cfl(DIMS, cdims, weights);
 
 	unmap_cfl(DIMS, dims, data);
 }

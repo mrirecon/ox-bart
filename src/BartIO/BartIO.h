@@ -104,7 +104,7 @@ namespace GERecon
 		/**
 		 * Write BART file to dicoms using pfile info
 		 */
-		void BartToDicom(const long dims[DIMS], const std::string& fileNamePrefix, const boost::optional<int>& seriesNumber, const boost::optional<std::string>& seriesDescription, const GEDicom::NetworkPointer& dicomNetwork, const _Complex float* ksp, const Legacy::PfilePointer& pfile, const float pfileVersion = 0.);
+		void BartToDicom(const long dims[DIMS], const std::string& fileNamePrefix, const boost::optional<int>& seriesNumber, const boost::optional<std::string>& seriesDescription, const GEDicom::NetworkPointer& dicomNetwork, const _Complex float* ksp, const Legacy::PfilePointer& pfile, const float pfileVersion = 0., const _Complex float* channel_weights = NULL);
 
 
 /*

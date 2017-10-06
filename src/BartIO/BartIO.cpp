@@ -342,7 +342,7 @@ void BartIO::BartZipAndZTransform(const long dims_zip[DIMS], _Complex float* ksp
 /*
  * Write BART ksp file to dicoms using Pfile for auxiliary info
  */
-void BartIO::BartToDicom(const long dims[DIMS], const std::string& fileNamePrefix, const boost::optional<int>& seriesNumber, const boost::optional<std::string>& seriesDescription, const GEDicom::NetworkPointer& dicomNetwork, const _Complex float* ksp, const Legacy::PfilePointer& pfile, const float pfileVersion)
+void BartIO::BartToDicom(const long dims[DIMS], const std::string& fileNamePrefix, const boost::optional<int>& seriesNumber, const boost::optional<std::string>& seriesDescription, const GEDicom::NetworkPointer& dicomNetwork, const _Complex float* ksp, const Legacy::PfilePointer& pfile, const float pfileVersion, const _Complex float* channel_weights)
 {
 	TracePointer trace = Trace::Instance();
 
@@ -354,17 +354,24 @@ void BartIO::BartToDicom(const long dims[DIMS], const std::string& fileNamePrefi
 	// Pull info directly out of ProcessingControl    
 	const int imageXRes = processingControl->Value<int>("ImageXRes");
 	const int imageYRes = processingControl->Value<int>("ImageYRes");
-	const FloatVector channelWeights = processingControl->Value<FloatVector>("ChannelWeights");
+	FloatVector channelWeights = processingControl->Value<FloatVector>("ChannelWeights");
+
 
 	// Create DICOM series to save images into
 	const Legacy::DicomSeries dicomSeries(pfile);
-
-	int numZipSlices = pfile->SliceCount();
 
 	int numAcqSlices = dims[PHS2_DIM];
 	int numPhases = dims[TIME_DIM];
 	int numEchoes = dims[TE_DIM];
 	int numChannels = dims[COIL_DIM];
+
+	if (NULL != channel_weights) {
+
+		for (int currentChannel = 0; currentChannel < numChannels; currentChannel++)
+			channelWeights(currentChannel) = __real__ channel_weights[currentChannel];
+	}
+
+	int numZipSlices = pfile->SliceCount();
 
 	bool zip_on = false;
 	bool zip_forward = true;
@@ -384,7 +391,7 @@ void BartIO::BartToDicom(const long dims[DIMS], const std::string& fileNamePrefi
 	assert(processingControl->Value<int>("AcquiredYRes") == dims[1]);
 	assert(processingControl->Value<int>("AcquiredZRes") == numAcqSlices);
 	//assert(pfile->PhaseCount() == numPhases);
-	assert(pfile->ChannelCount() == numChannels);
+	//assert(pfile->ChannelCount() == numChannels);
 	//assert(pfile->EchoCount() == numEchoes);
 	assert(numZipSlices >= numAcqSlices);
 
