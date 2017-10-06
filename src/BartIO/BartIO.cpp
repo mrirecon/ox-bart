@@ -354,7 +354,6 @@ void BartIO::BartToDicom(const long dims[DIMS], const std::string& fileNamePrefi
 	// Pull info directly out of ProcessingControl    
 	const int imageXRes = processingControl->Value<int>("ImageXRes");
 	const int imageYRes = processingControl->Value<int>("ImageYRes");
-	FloatVector channelWeights = processingControl->Value<FloatVector>("ChannelWeights");
 
 
 	// Create DICOM series to save images into
@@ -365,10 +364,28 @@ void BartIO::BartToDicom(const long dims[DIMS], const std::string& fileNamePrefi
 	int numEchoes = dims[TE_DIM];
 	int numChannels = dims[COIL_DIM];
 
+	FloatVector channelWeights(numChannels);
+	
+
 	if (NULL != channel_weights) {
+
+		std::cout << "Using channel weights from command-line" << std::endl;
 
 		for (int currentChannel = 0; currentChannel < numChannels; currentChannel++)
 			channelWeights(currentChannel) = __real__ channel_weights[currentChannel];
+	}
+	else if (pfile->ChannelCount() != numChannels) {
+
+		std::cout << "Using all-ones for channel weights" << std::endl;
+
+		// data is probably coil compressed. let's ignore the Pfile's channel weights
+		for (int currentChannel = 0; currentChannel < numChannels; currentChannel++)
+			channelWeights(currentChannel) = 1.;
+	}
+	else {
+
+		std::cout << "Using channel weights from Pfile" << std::endl;
+		channelWeights = processingControl->Value<FloatVector>("ChannelWeights");
 	}
 
 	int numZipSlices = pfile->SliceCount();
@@ -390,10 +407,8 @@ void BartIO::BartToDicom(const long dims[DIMS], const std::string& fileNamePrefi
 	assert(processingControl->Value<int>("AcquiredXRes") == dims[0]);
 	assert(processingControl->Value<int>("AcquiredYRes") == dims[1]);
 	assert(processingControl->Value<int>("AcquiredZRes") == numAcqSlices);
-	//assert(pfile->PhaseCount() == numPhases);
-	//assert(pfile->ChannelCount() == numChannels);
-	//assert(pfile->EchoCount() == numEchoes);
 	assert(numZipSlices >= numAcqSlices);
+
 
 	// apply zip in Z direction
 	long dims_zip[DIMS];
