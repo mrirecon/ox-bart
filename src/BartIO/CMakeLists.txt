@@ -16,7 +16,7 @@ target_link_libraries(${PROJECT_NAME} num)
 target_link_libraries(${PROJECT_NAME} misc)
 target_link_libraries(${PROJECT_NAME} fftw3f)
 target_link_libraries(${PROJECT_NAME} fftw3f_threads)
-target_link_libraries(${PROJECT_NAME} cblas)
+target_link_libraries(${PROJECT_NAME} openblas)
 target_link_libraries(${PROJECT_NAME} lapacke)
 
 
