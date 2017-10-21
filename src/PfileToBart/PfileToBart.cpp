@@ -105,10 +105,22 @@ void GERecon::BartWrite()
 
 	// load kspace data from Pfile
 	long dims[PFILE_DIMS];
+
+#if 1
+	// FIXME: rare occasions where data size does not match pfile/proccesing control specified size...
+	const ComplexFloatMatrix kSpace = pfile->KSpaceData<float>(Legacy::Pfile::PassSlicePair(0, 0), 0, 0);
+	long dims1[DIMS];
+	BartIO::BartDims(dims1, kSpace);
+	dims[0] = dims1[0];
+	dims[1] = dims1[1];
 	
-	// FIXME: differentiate between passes and phases
+	
+#else
 	dims[0] = acqXRes;
 	dims[1] = acqYRes;
+#endif
+
+	// FIXME: differentiate between passes and phases
 	dims[2] = acqZRes;
 	dims[3] = numEchoes;
 	dims[4] = numChannels;
