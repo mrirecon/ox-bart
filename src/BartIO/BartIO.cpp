@@ -210,11 +210,18 @@ void BartIO::PfileToBart(const long dims[PFILE_DIMS], _Complex float* out, const
 					if (!zip_forward)
 						sl = numZipSlices - currentSlice - 1;
 
-#if 0
-					const ComplexFloatMatrix kSpace = pfile->KSpaceData<float>(sl, currentEcho, currentChannel, currentPhase);
-#else
-					const ComplexFloatMatrix kSpace = pfile->KSpaceData<float>(Legacy::Pfile::PassSlicePair(currentPass, sl), currentEcho, currentChannel);
-#endif
+					ComplexFloatMatrix kSpace;
+
+					if (pfile->IsZEncoded()) {
+
+						ComplexFloatMatrix kSpace1 = pfile->KSpaceData<float>(Legacy::Pfile::PassSlicePair(currentPass, sl), currentEcho, currentChannel);
+						kSpace.reference(kSpace1);
+					}
+					else {
+
+						ComplexFloatMatrix kSpace1 = pfile->KSpaceData<float>(sl, currentEcho, currentChannel, currentPass);
+						kSpace.reference(kSpace1);
+					}
 
 					long dims1[N];
 					BartIO::BartDims(dims1, kSpace);
