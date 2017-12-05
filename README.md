@@ -60,3 +60,11 @@ Write BART-formatted data in <kspace> to dicom using Pfile info.
 --fftmod flags performs an FFTMod on the data along flags
 --weights <weights> inputs custom channel weights
 ```
+
+
+### `NoiseCov`
+```bash
+Usage: NoiseCov --input <NoiseStatistics> --covar <covar> --noise <noise> --optmat <optmat>
+
+Write noise data and covariance matrix files to BART-formatted data
+```
