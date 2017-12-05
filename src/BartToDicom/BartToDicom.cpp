@@ -70,6 +70,7 @@ void GERecon::BartToDicom()
 	const GEDicom::NetworkPointer dicomNetwork = CommandLine::DicomNetwork();
 	const boost::optional<int> seriesNumber = CommandLine::SeriesNumber();
 	const boost::optional<std::string> seriesDescription = CommandLine::SeriesDescription();
+	const boost::optional<std::string> fileNamePrefix = CommandLine::FileNamePrefix();
 
 	const long ifft_flags = *CommandLine::IFFT();
 	const long fft_flags = *CommandLine::FFT();
@@ -118,8 +119,13 @@ void GERecon::BartToDicom()
 		fftuc(PFILE_DIMS, dims, fft_flags, data, data);
 	}
 
+
+	std::string fileName = "Image";
+	if (fileNamePrefix)
+		fileName = fileNamePrefix->c_str();
+
 	// write to dicom
-	BartIO::BartToDicom(dims, "Image", seriesNumber, seriesDescription, dicomNetwork, data, pfile, pfileVersion, weights);
+	BartIO::BartToDicom(dims, fileName, seriesNumber, seriesDescription, dicomNetwork, data, pfile, pfileVersion, weights);
 
 	if (NULL != weights)
 		unmap_cfl(DIMS, cdims, weights);

@@ -111,6 +111,15 @@ namespace GERecon
         static boost::optional<std::string> SeriesDescription();
 
         /**
+         * Get the file name prefix specified on the command line. If it is not set
+         * or does not exist, an empty string is returned.
+         *
+         * Usage:
+         *   --name <name>
+         */
+        static boost::optional<std::string> FileNamePrefix();
+
+        /**
          * Get a DICOM network from parameters passed on the command line. If all
          * parameters are not set or the network cannot be create an empty pointer
          * will be returned.

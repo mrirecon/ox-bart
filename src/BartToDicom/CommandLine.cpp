@@ -157,6 +157,19 @@ boost::optional<std::string> CommandLine::SeriesDescription()
     return programOptions.Get<std::string>("description");
 }
 
+boost::optional<std::string> CommandLine::FileNamePrefix()
+{
+    boost::program_options::options_description options;
+
+    options.add_options()
+        ("name", boost::program_options::value<std::string>(), "File name prefix");
+
+    const GESystem::ProgramOptions programOptions;
+    programOptions.AddOptions(options);
+
+    return programOptions.Get<std::string>("name");
+}
+
 GEDicom::NetworkPointer CommandLine::DicomNetwork()
 {
     // Create option to get Dicom Network info.
