@@ -10,7 +10,7 @@ These tools use the GE Orchestra API. The Orchestra SDK is copyright GE Healthca
 
 ## Requirements
 *  Tested with BART v0.3.01 and v0.4.01. Currently does not support CUDA builds (trivial fix)
-*  Tested with Ox v1.6
+*  Tested with Ox v1.6 and Ox v1.7
 *  Requires cmake 3.6 or higher
 
 ## Building

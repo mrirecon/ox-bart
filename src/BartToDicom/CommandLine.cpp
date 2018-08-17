@@ -194,7 +194,7 @@ GEDicom::NetworkPointer CommandLine::DicomNetwork()
     {
         std::cout << "Sending DICOM Image to:" << std::endl;
         std::cout << "IP: " << *ip << " Port: " << *port << " Peer: " << *peer << " Title: " << *title << std::endl;
-        return boost::make_shared<GEDicom::Network>(*ip, *port, *title, *peer);
+        return boost::make_shared<GEDicom::Network>(*ip, *port, *title, *peer, true);
     }
 
     return boost::shared_ptr<GEDicom::Network>();
