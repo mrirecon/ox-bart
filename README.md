@@ -68,3 +68,11 @@ Usage: NoiseCov --input <NoiseStatistics> --covar <covar> --noise <noise> --optm
 
 Write noise data and covariance matrix files to BART-formatted data
 ```
+
+
+### `CalibrationData`
+```bash
+Usage: CalibrationData --pfile <Pfile> --input <RawCalibration> --body <body_coil> 
+
+Write body coil pre-scan h5 data into BART-formatted file based on dimensions in <Pfile>
+```
