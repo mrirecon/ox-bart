@@ -9,8 +9,8 @@
 // orchestra includes
 #include <MDArray/Utils.h>
 
-#include <Dicom/MR/Image.h>
-#include <Dicom/Network.h>
+#include <Dicom/Core/MR/Image.h>
+#include <Dicom/Core/Network.h>
 
 #include <Orchestra/Cartesian2D/KSpaceTransformer.h>
 #include <Orchestra/Cartesian3D/ZTransformer.h>

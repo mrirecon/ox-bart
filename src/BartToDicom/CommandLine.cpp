@@ -11,7 +11,7 @@
 
 #include <System/Utilities/ProgramOptions.h>
 
-#include <Dicom/Network.h>
+#include <Dicom/Core/Network.h>
 
 #include "CommandLine.h"
 #include <Orchestra/Common/ReconException.h>
