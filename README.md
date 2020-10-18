@@ -9,8 +9,8 @@ are NOT FOR DIAGNOSTIC USE. See LICENSE for details.
 These tools use the GE Orchestra API. The Orchestra SDK is copyright GE Healthcare
 
 ## Requirements
-*  Tested with BART v0.3.01, v0.4.01, (and up to commit 5ea0a5a). Currently does not support CUDA builds (trivial fix)
-*  Tested with Ox v1.8 (older versions not currently supported)
+*  Tested with BART v0.6.00 (e1a4303). Currently does not support CUDA builds (trivial fix)
+*  Tested with Ox v1.10 (older versions not currently supported)
 *  Requires cmake 3.6 or higher
 
 ## Building
