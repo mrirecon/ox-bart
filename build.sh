@@ -6,8 +6,8 @@ set -o pipefail
 OX_INSTALL_DIRECTORY=${OX_INSTALL_DIRECTORY?="Orchestra SDK directory (OX_INSTALL_DIRECTORY) not set!"}
 TOOLBOX_PATH=${TOOLBOX_PATH?="BART directory (TOOLBOX_PATH) not set!"}
 
-export CC=${CC:=gcc-4.9}
-export CXX=${CXX:=g++-4.9}
+export CC=${CC:=gcc-4.8}
+export CXX=${CXX:=g++-4.8}
 
 VERBOSE=${VERBOSE:=0}
 
