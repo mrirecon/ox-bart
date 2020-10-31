@@ -25,6 +25,12 @@
 #include <Orchestra/Legacy/DicomSeries.h>
 #include <Orchestra/Legacy/Pfile.h>
 
+#include <Orchestra/Acquisition/ControlPacket.h>
+#include <Orchestra/Acquisition/ControlTypes.h>
+#include <Orchestra/Acquisition/Core/ArchiveStorage.h>
+#include <Orchestra/Acquisition/DataTypes.h>
+#include <Orchestra/Acquisition/FrameControl.h>
+
 #include <Orchestra/Core/SumOfSquares.h>
 #include <Orchestra/Core/Clipper.h>
 #include <Orchestra/Core/RotateTranspose.h>
@@ -33,6 +39,9 @@
 #include <Orchestra/Common/SliceOrientation.h>
 #include <Orchestra/Common/SliceCorners.h>
 #include <Orchestra/Common/ReconTrace.h>
+#include <Orchestra/Common/ScanArchive.h>
+#include <Orchestra/Common/ReconPaths.h>
+
 
 // includes for bart
 #include <assert.h>
@@ -158,6 +167,101 @@ bool BartIO::get_zip_dir(const long dims[PFILE_DIMS], const Legacy::PfilePointer
 	}
 }
 
+
+void BartIO::ScanArchiveToBart(const long dims[PFILE_DIMS], _Complex float* out, const ScanArchivePointer scanArchive)
+{
+	Trace trace("ScanArchiveToBart");
+
+	unsigned int N = PFILE_DIMS;
+
+	// FIXME: check compatibility of pfile dimensions
+	// FIXME: check phases vs passes
+
+	//const int numSlices = dims[2];
+	//const int numEchoes = dims[3];
+	const int numChannels = dims[4];
+#if 0
+	const int numPhases = dims[5];
+#else
+	//const int numPasses = dims[5];
+#endif
+	const Range all = Range::all();
+
+
+	// Set the GERecon::Path locations prior to loading the saved files
+	const boost::filesystem::path scanArchiveFullPath = scanArchive->Path();
+	Path::SetAllInputPaths(scanArchiveFullPath.parent_path() / "ScanArchiveFiles");
+	scanArchive->LoadSavedFiles();
+	// Load the archive storage which contains all acquisition data held in the archive
+	Acquisition::ArchiveStoragePointer archiveStorage = Acquisition::ArchiveStorage::Create(scanArchive);
+
+	// Determine how many control (DAB) packets are contained in the storage
+	const size_t numControls = archiveStorage->AvailableControlCount();
+	std::cout << "numControls is " << numControls << std::endl;
+
+	int frameType = 0;
+	int viewIndex = 0;
+	int viewValue = 0;
+	int echoIndex = 0;
+	int sliceIndex = 0;
+
+	//ComplexFloat5D kSpaceAll(dims[0], dims[1], numEchoes, numSlices, numChannels);
+
+	// Loop over all control packets in the archive. Some control packtes are scan control packets
+	//which may indicate the end of an acquisition (pass) or the end of the scan. Other control
+	// packets are frame control packets which describe the raw frame (or view) data they're
+	// associated with. All control packets and associated frame data are stored in the archive
+	// in the order they're acquired.
+	//#pragma omp parallel for
+	for (size_t controlPacketIndex = 0; controlPacketIndex < numControls; ++controlPacketIndex)
+	{
+		const Acquisition::FrameControlPointer controlPacketAndFrameData = archiveStorage->NextFrameControl();
+
+		if (controlPacketAndFrameData->Control().Opcode() == Acquisition::ProgrammableOpcode)
+		{
+
+			const Acquisition::ProgrammableControlPacket framePacket = controlPacketAndFrameData->Control().Packet().As<Acquisition::ProgrammableControlPacket>();
+
+			// Only include ImageFrames
+			viewValue = Acquisition::GetPacketValue(framePacket.viewNumH, framePacket.viewNumL);
+			frameType = viewValue == 0 ? Acquisition::BaselineFrame : Acquisition::ImageFrame;
+
+			if (frameType == Acquisition::ImageFrame) {
+
+				// If packet view number == 0, then this is a baseline view, else correct the baseline view number
+				viewIndex = viewValue == 0 ? 0 : viewValue - 1;
+				echoIndex = framePacket.echoNum;
+				sliceIndex = Acquisition::GetPacketValue(framePacket.sliceNumH, framePacket.sliceNumL);
+
+				const ComplexFloatCube frameRawData = controlPacketAndFrameData->Data();
+
+				for (int currentChannel = 0; currentChannel < numChannels; ++currentChannel)
+				{
+
+					ComplexFloatVector oneReadout = frameRawData(all, currentChannel, 0);
+
+					//kSpaceAll(all, viewIndex, echoIndex, sliceIndex, currentChannel) = oneReadout;
+					long dims1[N];
+					md_singleton_dims(N, dims1);
+					//BartIO::BartDims(dims1, oneReadout);
+					dims1[0] = dims[0];
+					//assert(md_check_compat(N, ~(MD_BIT(0) | MD_BIT(1)), dims, dims1));
+
+					long currentPass = 0;
+					long pos[N];
+					md_set_dims(N, pos, 0);
+					pos[1] = viewIndex;
+					pos[2] = sliceIndex;
+					pos[3] = echoIndex;
+					pos[4] = currentChannel;
+					pos[5] = currentPass;
+
+					md_copy_block(N, pos, dims, out, dims1, oneReadout.data(), CFL_SIZE);
+				}
+			}
+		}
+	}
+}
 
 /**
  * Extract Pfile data and copy to BART array
