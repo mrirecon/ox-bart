@@ -1,4 +1,6 @@
 *.swp
+*.swo
 tags
 .DS_Store
 build
+sdk
