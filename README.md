@@ -47,6 +47,18 @@ Write <Pfile> data into BART-formatted file <kspace>.
 --weights <file> output channel weights to <file>
 ```
 
+### `ScanArchiveToBart`
+Use to convert a ScanArchive to a BART cfl/hdr file.
+```bash
+Usage: ScanArchiveToBart [options] --file <ScanArchive> --output <kspace>
+
+Write <ScanArchive> data into BART-formatted file <kspace>.
+--fft flags performs an FFT on the data along flags
+--ifft flags performs an IFFT on the data along flags
+--fftmod flags performs an FFTMod on the data along flags
+--weights <file> output channel weights to <file>
+```
+
 ### `BartToDicom`
 Takes a Pfile and a bart kspace file, and generates Dicoms using the Ox Dicom chain,
 e.g. gradwarp, resizing, etc.

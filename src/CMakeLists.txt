@@ -42,6 +42,7 @@ include (${TOPDIR}/recon/SDK/product.cmake)
 # Include CMakeLists.txt for each rehearsal project
 add_subdirectory (BartIO)
 add_subdirectory (PfileToBart)
+add_subdirectory (ScanArchiveToBart)
 add_subdirectory (BartToDicom)
 add_subdirectory (NoiseCov)
 add_subdirectory (CalibrationData)
