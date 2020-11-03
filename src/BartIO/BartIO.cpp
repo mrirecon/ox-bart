@@ -168,7 +168,7 @@ bool BartIO::get_zip_dir(const long dims[PFILE_DIMS], const Legacy::PfilePointer
 }
 
 
-void BartIO::ScanArchiveToBart(const long dims[PFILE_DIMS], _Complex float* out, const ScanArchivePointer scanArchive)
+long BartIO::ScanArchiveToBart(const long dims[PFILE_DIMS], _Complex float* out, const ScanArchivePointer scanArchive, const bool store_sequential)
 {
 	Trace trace("ScanArchiveToBart");
 
@@ -184,7 +184,6 @@ void BartIO::ScanArchiveToBart(const long dims[PFILE_DIMS], _Complex float* out,
 #endif
 
 	const Range all = Range::all();
-
 
 	// Set the GERecon::Path locations prior to loading the saved files
 	const boost::filesystem::path scanArchiveFullPath = scanArchive->Path();
@@ -203,12 +202,23 @@ void BartIO::ScanArchiveToBart(const long dims[PFILE_DIMS], _Complex float* out,
 	int echoIndex = 0;
 	int sliceIndex = 0;
 
+	long pos[N];
+	md_set_dims(N, pos, 0);
+
+	long dims1[N];
+	md_singleton_dims(N, dims1);
+
+	//BartIO::BartDims(dims1, oneReadout);
+	dims1[0] = dims[0]; // readout
+	dims1[4] = dims[4]; // coils
+
 	// Loop over all control packets in the archive. Some control packtes are scan control packets
 	//which may indicate the end of an acquisition (pass) or the end of the scan. Other control
 	// packets are frame control packets which describe the raw frame (or view) data they're
 	// associated with. All control packets and associated frame data are stored in the archive
 	// in the order they're acquired.
 	//#pragma omp parallel for
+	unsigned int num_views = 0;
 	for (size_t controlPacketIndex = 0; controlPacketIndex < numControls; ++controlPacketIndex)
 	{
 		const Acquisition::FrameControlPointer controlPacketAndFrameData = archiveStorage->NextFrameControl();
@@ -231,23 +241,25 @@ void BartIO::ScanArchiveToBart(const long dims[PFILE_DIMS], _Complex float* out,
 
 				const ComplexFloatCube frameRawData = controlPacketAndFrameData->Data();
 
-				long dims1[N];
-				md_singleton_dims(N, dims1);
-				//BartIO::BartDims(dims1, oneReadout);
-				dims1[0] = dims[0]; // readout
-				dims1[4] = dims[4]; // coils
+				if (store_sequential) {
+					md_next(N, dims, ~(READ_FLAG | COIL_FLAG), pos); // FIXME: check this doesn't return false
+					//std::cout << "flag is " << flag << std::endl;
+				}
+				else {
 
-				long pos[N];
-				md_set_dims(N, pos, 0);
-				pos[1] = viewIndex;
-				pos[2] = sliceIndex;
-				pos[3] = echoIndex;
-				//pos[5] = currentPass;
-				ComplexFloatMatrix oneReadout = frameRawData(all, all, 0);
+					pos[1] = viewIndex;
+					pos[2] = sliceIndex;
+					pos[3] = echoIndex;
+					//pos[5] = currentPass; // FIXME: check for multiple passes
+				}
+				ComplexFloatMatrix oneReadout = frameRawData(all, all, 0); // is this "zero" the index for pass?
 				md_copy_block(N, pos, dims, out, dims1, oneReadout.data(), CFL_SIZE);
+				num_views++;
 			}
 		}
 	}
+
+	return num_views;
 }
 
 /**

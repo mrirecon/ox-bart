@@ -78,7 +78,7 @@ namespace GERecon
 		 * Extract ScanArchive data and copy to BART array
 		 * Assumes nothing about conventions of dimensions.
 		 */
-		void ScanArchiveToBart(const long dims[PFILE_DIMS], _Complex float* out, const ScanArchivePointer scanArchive);
+		long ScanArchiveToBart(const long dims[PFILE_DIMS], _Complex float* out, const ScanArchivePointer scanArchive, bool store_sequential);
 
 		/**
 		 * Extract Pfile data and copy to BART array

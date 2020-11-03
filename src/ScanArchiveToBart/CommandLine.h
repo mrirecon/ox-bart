@@ -51,6 +51,15 @@ namespace GERecon
          * Usage:
          *   --output <file>
          */
+
+        /**
+         * sequential  storage
+         *
+         * Usage:
+         *   --sequential 1
+         */
+	static boost::optional<unsigned int> SequentialStorage();
+
         static boost::optional<std::string> Output();
 
         /**

@@ -63,6 +63,7 @@ void GERecon::BartWrite()
 	const long ifft_flags = *CommandLine::IFFT();
 	const long fft_flags = *CommandLine::FFT();
 	const long fftmod_flags = *CommandLine::FFTMod();
+	const unsigned int store_sequential = *CommandLine::SequentialStorage();
 
 	// Read Pfile from command line
 	const boost::filesystem::path filePath = CommandLine::ScanArchivePath();
@@ -97,33 +98,48 @@ void GERecon::BartWrite()
 
 	// load kspace data from Pfile
 	long dims[PFILE_DIMS];
+	md_singleton_dims(PFILE_DIMS, dims);
 
-#if 0
-	// FIXME: rare occasions where data size does not match pfile/proccesing control specified size...
-	const ComplexFloatMatrix kSpace = pfile->KSpaceData<float>(Legacy::Pfile::PassSlicePair(0, 0), 0, 0);
-	long dims1[DIMS];
-	BartIO::BartDims(dims1, kSpace);
-	dims[0] = dims1[0];
-	dims[1] = dims1[1];
-	
-	
-#else
-	dims[0] = acqXRes;
-	dims[1] = acqYRes;
-#endif
+	//bool store_sequential = true; // FIXME: test sequential writing
 
-	// FIXME: differentiate between passes and phases
-	dims[2] = acqZRes;
-	dims[3] = numEchoes;
-	dims[4] = numChannels;
-	dims[5] = numPhases;
+	if (store_sequential) {
+
+		std::cout << "Sequential mode. Storing data sequentially in the output" << std::endl;
+		dims[0] = acqXRes;
+		dims[1] = acqYRes * acqZRes * numEchoes * numPhases;
+		dims[4] = numChannels;
+	}
+	else {
+
+		// FIXME: differentiate between passes and phases
+		dims[0] = acqXRes;
+		dims[1] = acqYRes;
+		dims[2] = acqZRes;
+		dims[3] = numEchoes;
+		dims[4] = numChannels;
+		dims[5] = numPhases;
+	}
 
 	debug_print_dims(DP_INFO, PFILE_DIMS, dims);
 
 	// copy into bart-formatted ksp array
 	_Complex float* ksp2 = (_Complex float*)md_alloc(PFILE_DIMS, dims, CFL_SIZE);
+	_Complex float* ksp3 = NULL;
 
-	BartIO::ScanArchiveToBart(dims, ksp2, scanArchive);
+	long num_views = BartIO::ScanArchiveToBart(dims, ksp2, scanArchive, store_sequential);
+
+	if (store_sequential && num_views < dims[1]) {
+
+		long dims1[PFILE_DIMS];
+		md_select_dims(PFILE_DIMS, ~MD_BIT(1), dims1, dims);
+		dims1[1] = num_views;
+		long pos[PFILE_DIMS];
+		md_set_dims(PFILE_DIMS, pos, 0);
+		ksp3 = (_Complex float*)md_alloc(PFILE_DIMS, dims, CFL_SIZE);
+		md_copy_block(PFILE_DIMS, pos, dims1, ksp3, dims, ksp2, CFL_SIZE);
+		md_free(ksp2);
+		ksp2 = ksp3;
+	}
 
 	if (0 != fftmod_flags) {
 

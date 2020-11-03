@@ -48,6 +48,21 @@ boost::filesystem::path CommandLine::ScanArchivePath()
 }
 
 
+// option for sequential storage 
+boost::optional<unsigned int> CommandLine::SequentialStorage()
+{
+    boost::program_options::options_description options;
+
+    options.add_options()
+        ("sequential", boost::program_options::value<unsigned int>()->default_value(0), "Store data sequentially in array");
+
+    const GESystem::ProgramOptions programOptions;
+    programOptions.AddOptions(options);
+
+    return programOptions.Get<unsigned int>("sequential");
+}
+
+
 // Create option for output file name
 boost::optional<std::string> CommandLine::Output()
 {
