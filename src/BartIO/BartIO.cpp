@@ -177,14 +177,12 @@ void BartIO::ScanArchiveToBart(const long dims[PFILE_DIMS], _Complex float* out,
 	// FIXME: check compatibility of pfile dimensions
 	// FIXME: check phases vs passes
 
-	//const int numSlices = dims[2];
-	//const int numEchoes = dims[3];
-	const int numChannels = dims[4];
 #if 0
 	const int numPhases = dims[5];
 #else
 	//const int numPasses = dims[5];
 #endif
+
 	const Range all = Range::all();
 
 
@@ -204,8 +202,6 @@ void BartIO::ScanArchiveToBart(const long dims[PFILE_DIMS], _Complex float* out,
 	int viewValue = 0;
 	int echoIndex = 0;
 	int sliceIndex = 0;
-
-	//ComplexFloat5D kSpaceAll(dims[0], dims[1], numEchoes, numSlices, numChannels);
 
 	// Loop over all control packets in the archive. Some control packtes are scan control packets
 	//which may indicate the end of an acquisition (pass) or the end of the scan. Other control
@@ -235,29 +231,20 @@ void BartIO::ScanArchiveToBart(const long dims[PFILE_DIMS], _Complex float* out,
 
 				const ComplexFloatCube frameRawData = controlPacketAndFrameData->Data();
 
-				for (int currentChannel = 0; currentChannel < numChannels; ++currentChannel)
-				{
+				long dims1[N];
+				md_singleton_dims(N, dims1);
+				//BartIO::BartDims(dims1, oneReadout);
+				dims1[0] = dims[0]; // readout
+				dims1[4] = dims[4]; // coils
 
-					ComplexFloatVector oneReadout = frameRawData(all, currentChannel, 0);
-
-					//kSpaceAll(all, viewIndex, echoIndex, sliceIndex, currentChannel) = oneReadout;
-					long dims1[N];
-					md_singleton_dims(N, dims1);
-					//BartIO::BartDims(dims1, oneReadout);
-					dims1[0] = dims[0];
-					//assert(md_check_compat(N, ~(MD_BIT(0) | MD_BIT(1)), dims, dims1));
-
-					long currentPass = 0;
-					long pos[N];
-					md_set_dims(N, pos, 0);
-					pos[1] = viewIndex;
-					pos[2] = sliceIndex;
-					pos[3] = echoIndex;
-					pos[4] = currentChannel;
-					pos[5] = currentPass;
-
-					md_copy_block(N, pos, dims, out, dims1, oneReadout.data(), CFL_SIZE);
-				}
+				long pos[N];
+				md_set_dims(N, pos, 0);
+				pos[1] = viewIndex;
+				pos[2] = sliceIndex;
+				pos[3] = echoIndex;
+				//pos[5] = currentPass;
+				ComplexFloatMatrix oneReadout = frameRawData(all, all, 0);
+				md_copy_block(N, pos, dims, out, dims1, oneReadout.data(), CFL_SIZE);
 			}
 		}
 	}
