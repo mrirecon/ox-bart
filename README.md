@@ -8,13 +8,13 @@ are NOT FOR DIAGNOSTIC USE. See LICENSE for details.
 
 These tools use the GE Orchestra API. The Orchestra SDK is copyright GE Healthcare
 
-# Ox v.2.xx Requirements
+# Ox v.2.01 Requirements
 *  Tested with BART v0.7.00. Requires some light modification of Makefile (included)
 *  Tested with OpenBLAS-0.3.15. Requires building from source within Docker
 *  Requires docker
 
 ## Building
-Starting in Orchestra 2.x, we need to build ox-bart within the supplied Docker container.
+Starting in Orchestra 2.0.x, we need to build ox-bart within the supplied Docker container.
 This is a little tricky because it requires installing BART on HELiOS 6.10, which is quite old.
 Therefore, we need to build OpenBLAS from source and change some Makefile paths for Docker. We also have to
 update the RedHat repo index to point to GE's open HELiOS repo: http://linux.gehealthcare.com/HELiOS6/HELiOS-6.10/os/x86_64/Packages/.
@@ -27,15 +27,12 @@ __Note__: this will overwrite some files in the BART directory. It is recommende
 1. Download OpenBLAS source from the website
 1. Download and install Docker. Follow the website for all setup instructions
 1. Set `TOOLBOX_PATH` to the top-level BART directory, e.g.
+1. Set `OX_INSTALL_DIRECTORY` to the top-level Orchestra sdk directory, e.g.
+1. Set `OPENBLAS_PATH` to the OpenBLAS source code directory e.g.  
+Example: 
 ```bash
 export TOOLBOX_PATH=/home/jtamir/bart
-```
-1. Set `OX_INSTALL_DIRECTORY` to the top-level Orchestra sdk directory, e.g.
-```bash
 export OX_INSTALL_DIRECTORY=/home/jtamir/orchestra-sdk
-```
-1. Set `OPENBLAS_PATH` to the OpenBLAS source code directory e.g.
-```bash
 export OPENBLAS_PATH=/home/jtamir/OpenBLAS-0.3.15
 ```
 
