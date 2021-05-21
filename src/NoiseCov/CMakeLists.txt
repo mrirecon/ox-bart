@@ -4,6 +4,7 @@ include_directories(${TOOLBOX_PATH}/src)
 include_directories(../BartIO)
 
 link_directories(${TOOLBOX_PATH}/lib)
+link_directories(${OPENBLAS_PATH}/lib)
 link_directories(../../build/BuildOutputs/lib)
 
 set(SOURCE_FILES

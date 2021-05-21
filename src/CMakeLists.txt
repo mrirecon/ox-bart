@@ -19,6 +19,14 @@ else()
 	message(FATAL_ERROR "BART TOOLBOX_PATH environment variable undefined!")
 endif()
 
+message("OpenBLAS Path:" $ENV{OPENBLAS_PATH})
+if(DEFINED ENV{OPENBLAS_PATH})
+	message(STATUS "OPENBLAS_PATH defined")
+	set(OPENBLAS_PATH "$ENV{OPENBLAS_PATH}")
+else()
+	message(FATAL_ERROR "OPENBLAS_PATH environment variable undefined!")
+endif()
+
 # TOPDIR is the root of the source tree
 set(OX_INSTALL_DIRECTORY "" CACHE PATH "Install directory of the GE Orchestra SDK")
 set(TOPDIR "${OX_INSTALL_DIRECTORY}/include")

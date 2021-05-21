@@ -7,7 +7,7 @@ export OPENBLAS_PATH=/opt/OpenBLAS
 export LD_LIBRARY_PATH=${OPENBLAS_PATH}/lib:${LD_LIBRARY_PATH}
 
 # update repo index
-cat yum.conf > /etc/yum.conf
+cat ox2.0/yum.conf > /etc/yum.conf
 
 # build OpenBLAS
 pushd /usr/local/openblas
@@ -19,8 +19,13 @@ popd
 yum install -y libpng-devel fftw3-devel lapack-devel
 
 # build BART
+echo cp ox2.0/bart/src/num/fft.c ${TOOLBOX_PATH}/src/num/fft.c
+echo cp ox2.0/bart/Makefile.local ${TOOLBOX_PATH}/
+echo cp ox2.0/bart/Makefile ${TOOLBOX_PATH}/
+cp ox2.0/bart/src/num/fft.c ${TOOLBOX_PATH}/src/num/fft.c
+cp ox2.0/bart/Makefile ${TOOLBOX_PATH}/
+cp ox2.0/bart/Makefile.local ${TOOLBOX_PATH}/
 pushd ${TOOLBOX_PATH}
-rsync -av --progress ox2.0/bart/* .
 make allclean
 make
 popd
