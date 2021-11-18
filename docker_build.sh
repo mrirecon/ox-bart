@@ -23,6 +23,6 @@ docker run --rm -it \
        -v ${TOOLBOX_PATH}:/usr/local/bart \
        -v ${OPENBLAS_PATH}:/usr/local/openblas \
        -w /home/sdkuser \
-       -p 8889:8889 \
+       -p 6543:6543 \
        -u 0 \
        $CONTAINER scl enable devtoolset-6 /home/sdkuser/ox2.0/docker_build_helper.sh
