@@ -62,48 +62,70 @@ sudo chmod 666 /var/run/docker.sock
 We will create a workspace folder in the home directory. Feel free to change the destination directory as desired.
 
 ```bash
-mkdir ~/Orchestra
-cd ~/Orchestra
+mkdir orchestra
+cd orchestra
 ```
 
-Save ``orchestra-sdk-2.0-1`` to ``~/Orchestra``. ``ls ~/Orchestra/orchestra-sdk-2.0-1`` should list something like:
+Save ``orchestra-sdk-2.0-1`` to ``orchestra/``. ``ls orchestra/orchestra-sdk-2.0-1`` should list something like:
 ```
 3p  Examples  include  lib  license  build.sh  cpp-sdk.tar.gz  openDockerContainer.sh
 ```
 
-Clone the repositories.
+Clone the repositories and checkout appropriate versions. Also set the environment variables
 ```bash
-cd ~/Orchestra
 git clone git@github.com:mrirecon/ox-bart.git
 git clone git@github.com:xianyi/OpenBLAS.git
 git clone git@github.com:mrirecon/bart.git
-sudo chown -R $USER .
-```
 
-The ``sudo`` command above may not be needed. Then,
+pushd bart
+git checkout f071aebf2491491b8a662bfd0cfd951ea63d5bd9
+export TOOLBOX_PATH=`pwd`
+popd
 
-```bash
-cd OpenBLAS
+pushd OpenBLAS
 git checkout tags/v0.3.15
-cd ~/Orchestra
+export OPENBLAS_PATH=`pwd`
+popd
+
+pushd orchestra-sdk-2.0-1
+OX_INSTALL_DIRECTORY=`pwd`
+popd
 ```
-
-Before installing, set the required enviorment variables.
-
-```bash
-export TOOLBOX_PATH=~/Orchestra/bart
-export OX_INSTALL_DIRECTORY=~/Orchestra/orchestra-sdk-2.0-1
-export OPENBLAS_PATH=~/Orchestra/OpenBLAS
-```
-
 Finally,
-
 ```bash
 cd ox-bart
 ./docker_build.sh
 ```
 
-You should find binary files located in ``~/Orchestra/ox-bart/bin/``.
+If all went well, you will find binary files located in ``orchestra/ox-bart/bin/``:
+```
+cd bin
+./ScanArchiveToBart
+```
+
+You can also access the ``BartIO`` library under ``orchestra/ox-bart/lib``.
+
+It can be helpful to check which libraries are linked to the binaries with the ``ldd`` command:
+```bash
+ldd ./ScanArchiveToBart
+#	linux-vdso.so.1 (0x00007ffd64fdf000)
+#	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007fa390329000)
+#	libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007fa390306000)
+#	libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007fa390300000)
+#	librt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007fa3902f3000)
+#	libfftw3f_threads.so.3 => /lib/x86_64-linux-gnu/libfftw3f_threads.so.3 (0x00007fa3902e9000)
+#	libopenblas.so.0 => /lib/x86_64-linux-gnu/libopenblas.so.0 (0x00007fa38e15c000)
+#	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fa38df42000)
+#	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fa38ddf3000)
+#	libgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0x00007fa38ddae000)
+#	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fa38dd91000)
+#	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fa38db9f000)
+#	/lib64/ld-linux-x86-64.so.2 (0x00007fa390362000)
+#	libfftw3f.so.3 => /lib/x86_64-linux-gnu/libfftw3f.so.3 (0x00007fa38d98f000)
+#	libgfortran.so.5 => /lib/x86_64-linux-gnu/libgfortran.so.5 (0x00007fa38d6c7000)
+#	libquadmath.so.0 => /lib/x86_64-linux-gnu/libquadmath.so.0 (0x00007fa38d67d000)
+```
+
 
 # Ox v1.10 Requirements
 *  Tested with BART v0.6.00 (e1a4303). Currently does not support CUDA builds (trivial fix)
