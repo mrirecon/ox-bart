@@ -41,24 +41,13 @@ Build the tools with
 ./docker_build.sh
 ```
 
-### Example
-
-The following commands were executed to install from scratch on an Ubuntu 20.04.2 LTS x86_64 install with Linux kernel: 5.8.0-50-generic.
+### Build script
+After docker is installed and the Orchestra SDK is downloaded, the script ``build_ox_2.0_from_scratch.sh`` should install everything else including dependencies. For step-by-step instructions, read below:
 
 #### Install docker.
-
-We will use ``snap``, but feel free to use your preferred method of installing docker.
-
-```bash
-sudo snap install docker
-sudo groupadd docker
-sudo usermod -aG docker $USER
-newgrp docker
-sudo chmod 666 /var/run/docker.sock
-```
+It is recommended to install following the official docker instructions from the Docker website.
 
 #### Clone required repositories.
-
 We will create a workspace folder in the home directory. Feel free to change the destination directory as desired.
 
 ```bash
